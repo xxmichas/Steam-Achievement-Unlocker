@@ -1,0 +1,223 @@
+body{
+    margin: 0 0 0 0;
+    width: 100%;
+    font-family: Sen;
+    color: lightgray;
+    background-color: #292b2f;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-attachment: fixed;
+}
+
+@font-face {
+    font-family: Sen;
+    src: url(Fonts/Sen.ttf);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+h1{
+    margin-left: 10px;
+}
+
+input:focus {
+    outline-offset: 0px;
+}
+
+:focus {
+    outline: none;
+}
+
+input[type="number" i], input[type="text" i] {
+    padding: 0px 0px 0px 10px;
+    border: none;
+    border-bottom: 3px solid #36393f;
+    background-color: rgba(0, 0, 0, 0);
+    height: 47px;
+    width: 200px;
+    color: #b9bbbe;
+    font: 30px Sen;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: right;
+}
+
+#AppID:focus ~ .bar:before {
+    width: 220px;
+}
+
+#SearchGame:focus ~ .bar2:before {
+    width: 220px;
+}
+
+.bar, .bar2 {
+    position: relative;
+    display: inline-block;
+    left: -10px;
+    top: 16px;
+}
+
+.bar:before, .bar2:before {
+    content: '';
+    height: 3px;
+    width: 0;
+    bottom: 0px;
+    position: absolute;
+    background: #2196F3;
+    transition: 0.4s ease all;
+    right: 0%;
+}
+
+input::placeholder {
+    color: #b9bbbe;
+}
+
+#MenuBtn, #ButtonGameList, #ResetSteamID, #SearchBtn{
+    background-color: #36393f;
+    border: 0;
+    height: 50px;
+    width: auto;
+    color: #b9bbbe;
+    padding: 0px 10px 0px 10px;
+    font: 30px Sen;
+    margin-left: 10px;
+    transition-duration: 0.4s;
+}
+
+#MenuBtn:hover, #ButtonGameList:hover, #ResetSteamID:hover, #SearchBtn:hover{
+    background-color: #202225;
+}
+
+#MenuBtn:active, #ButtonGameList:active, #ResetSteamID:active, #SearchBtn:active{
+    background-color: #4f545c;
+}
+
+#GamesList{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.gamediv{
+    width: auto;
+    height: 40px;
+    background-color: #2f3136;
+    margin-bottom: 5px;
+    color: #888888;
+    align-items: center;
+    display: flex;
+    padding-left: 5px;
+}
+
+.unlocked, .loading{
+    width: auto;
+    height: 40px;
+    margin-bottom: 5px;
+    color: #888888;
+    align-items: center;
+    display: flex;
+    padding-left: 5px;
+}
+
+.unlockable{
+    width: auto;
+    height: 40px;
+    margin-bottom: 5px;
+    color: #888888;
+    align-items: center;
+    display: flex;
+    padding-left: 5px;
+    background-color: #2f3136;
+}
+
+.runbtn{
+    background-color: #36393f;
+    border: 0;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    width: auto;
+    color: #b9bbbe;
+    font: 15px Sen;
+    padding: 0px 10px 0px 10px;
+    margin-left: 10px;
+    transition-duration: 0.4s;
+}
+
+.runbtn:hover{
+    background-color: #202225;
+}
+
+.runbtn:active{
+    background-color: #4f545c;
+}
+
+.topbuttondiv{
+    margin-bottom: 10px;
+}
+
+.randomlabel {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+.randomlabel input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.randomspan {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(136, 136, 136, 0.25);
+    transition: .4s;
+    border-radius: 20px;
+}
+  
+.randomspan:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: rgba(185, 187, 190, 0.65);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.randomcheckbox:checked + .randomspan {
+    background-color: rgba(136, 136, 136, 0.65);
+}
+  
+.randomcheckbox:focus + .randomspan {
+    box-shadow: 0 0 1px rgba(136, 136, 136, 0.65);
+}
+
+.randomcheckbox:checked + .randomspan:before {
+    transform: translateX(20px);
+}
+
+.randomdiv{
+    width: 175px;
+    height: 40px;
+    right: 0;
+    top: 0;
+    padding-top: 5px;
+    padding-right: 10px;
+    position: fixed;
+    background-color: #2f3136;
+    text-align: right;
+    border-radius: 0px 0px 0px 50px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3);
+}

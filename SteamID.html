@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Achievement Unlocker</title>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+    <body>
+        <h1>Achievement Unlocker</h1>
+        Checking your SteamID
+        <script>
+            let greenworks = require('./greenworks')
+            let fs = require('fs')
+            let ipc = require('electron').ipcRenderer
+
+            fs.writeFile(`steam_appid.txt`, "440", (err) => {
+                if (err) throw err;
+
+                try {
+                    if(greenworks.init()) {
+                        GetSteamID()
+                    }
+                }
+                catch(err) {
+                    document.write(err.message)
+                }
+            })
+            
+            function GetSteamID() {
+                setTimeout(() => {
+                    fs.writeFile(`SteamID.txt`, greenworks.getSteamId().getRawSteamID(), (err) => {
+                        if (err) throw err;
+
+                        ipc.send('steamid-close')
+                    })
+                }, 1000);
+            }
+        </script>
+    </body>
+</html>

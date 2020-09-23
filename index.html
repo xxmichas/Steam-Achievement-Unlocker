@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Achievement Unlocker</title>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+    <body>
+        <h1>Achievement Unlocker</h1>
+        <input type="number" id="AppID" placeholder="App ID"><span class="bar"></span><button id="MenuBtn" style="margin-right: 67px;">Run</button>
+        <input type="text" id="SearchGame" placeholder="Name"><span class="bar2"></span><button id="SearchBtn">Search</button>
+        <div id="GamesList">
+            <button id="ButtonGameList">Fetch your games automatically</button>
+            <button id="ResetSteamID">Reset SteamID</button>
+        </div>
+        <div id="GameArray">
+        </div>
+        <script>
+            let ipc = require('electron').ipcRenderer
+            let fs = require('fs')
+            const scrape = require('website-scraper')
+            const OverrideSave = require('website-scraper-existing-directory');
+            const xml = require('xml-js')
+
+            /*--------------------------------*/
+
+            btn = document.getElementById("MenuBtn")
+            btn.onclick = function () {
+                RunAppID(document.getElementById("AppID").value.toString())
+            }
+
+            /*--------------------------------*/
+
+            function RunAppID(AppID) {
+                fs.writeFile(`steam_appid.txt`, AppID, (err) => {
+                    if (err) throw err;
+
+                    ipc.send('start-steam')
+                    console.log(`App ID updated`);
+                })
+            }
+
+            /*--------------------------------*/
+
+            let SteamJSON, GameArray, SearchedID
+
+            /*--------------------------------*/
+
+            GameArray = document.getElementById("GameArray")
+
+            /*--------------------------------*/
+
+            SearchBtn = document.getElementById("SearchBtn")
+            SearchInput = document.getElementById("SearchGame");
+
+            SearchBtn.onclick = function() {
+                if (GameArray.hasChildNodes()) {
+                    filter = SearchInput.value.toUpperCase();
+                    SearchedGames =  GameArray.childNodes
+                    SearchedGamesArray = [...SearchedGames]
+                    for (i = 1; i < SearchedGamesArray.length; i++) {
+                        SearchedID = SearchedGamesArray[i].id;
+                        if (SearchedID.toUpperCase().indexOf(filter) > -1) {
+                            SearchedGamesArray[i].style.display = "";
+                        } else {
+                            SearchedGamesArray[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+
+            SearchInput.addEventListener("input", function() {
+                if (GameArray.hasChildNodes()) {
+                    filter = SearchInput.value.toUpperCase();
+                    SearchedGames =  GameArray.childNodes
+                    SearchedGamesArray = [...SearchedGames]
+                    for (i = 1; i < SearchedGamesArray.length; i++) {
+                        SearchedID = SearchedGamesArray[i].id;
+                        if (SearchedID.toUpperCase().indexOf(filter) > -1) {
+                            SearchedGamesArray[i].style.display = "";
+                        } else {
+                            SearchedGamesArray[i].style.display = "none";
+                        }
+                    }
+                }
+            })
+
+            /*--------------------------------*/
+
+            btn = document.getElementById("ButtonGameList")
+            btn.onclick = function () {
+                fs.readFile(`SteamID.txt`, 'utf-8', (err, SteamID) => {
+                    if (err) throw err;
+
+                    GameArray.innerHTML = ""
+                    Info(SteamID)
+                })
+            }
+
+            /*--------------------------------*/
+
+            Resetbtn = document.getElementById("ResetSteamID")
+            Resetbtn.onclick = function () {
+                ipc.send('get-steamid')
+            }
+
+            /*--------------------------------*/
+
+            async function Info(x) {
+                const result = await scrape({urls: [`https://steamcommunity.com/profiles/${x}/games?xml=1`], plugins: [ new OverrideSave() ], directory: 'SteamInfo'})
+
+                fs.readFile(`SteamInfo/index.html`, 'utf-8', (err, GameInfo) => {
+                    if (err) throw err;
+
+                    SteamJSON = xml.xml2json(GameInfo, {compact: true, spaces: 0})
+
+                    fs.writeFile(`SteamInfo/SteamJSON.json`, SteamJSON, (err) => {
+                        if (err) throw err;
+  
+                        CreateList()
+                    })  
+                })
+            }
+
+            /*--------------------------------*/
+
+            fs.exists("SteamInfo/SteamJSON.json", SteamExists => {
+
+                if (SteamExists) {
+                    CreateList()
+                }
+            })
+
+            /*--------------------------------*/
+            fs.exists("SteamID.txt", SteamExists => {
+
+                if (SteamExists) {
+                    fs.readFile(`SteamID.txt`, 'utf-8', (err, SteamID) => {
+                        if (err) throw err;
+                                
+                        console.log("found id")
+                    })
+                }
+                else {
+                    ipc.send('get-steamid')
+                }
+            })
+
+            /*--------------------------------*/
+            
+            function CreateList() {
+                fs.readFile(`SteamInfo/SteamJSON.json`, 'utf-8', (err, SteamJSON) => {
+                    if (err) throw err;
+                        
+                     GameListJSON = JSON.parse(SteamJSON)
+
+
+                    if(GameListJSON.gameslist.games == null) {
+                        console.log("profile is private")
+                        let gamediv = document.createElement("div")
+                        gamediv.innerHTML = "Your profile is private"
+                        GameArray.appendChild(gamediv)
+                    }
+                    else {
+                        if(Object.keys(GameListJSON.gameslist.games).length == 0) {
+                            console.log("games are private")
+                            let gamediv = document.createElement("div")
+                            gamediv.innerHTML = "Your games are private"
+                            GameArray.appendChild(gamediv)
+                        }
+                        else {
+                            GameListJSON.gameslist.games.game.sort(function(a, b) {
+                                return a.name._comment.slice(7, (a.name._comment.length - 2)).localeCompare(b.name._comment.slice(7, (b.name._comment.length - 2)));
+                            });
+                            
+                            CreateGameList(GameListJSON)
+                        }
+                    }
+                })
+            }
+
+            /*--------------------------------*/
+
+            function CreateGameList(GameList) {
+                for (i = 0 ; i < GameList.gameslist.games.game.length ; i++) {
+
+                    let gamediv = document.createElement("div")
+                    gamediv.className = "gamediv"
+                    gamediv.innerHTML = `${GameList.gameslist.games.game[i].appid._text} - ${GameList.gameslist.games.game[i].name._comment.slice(7, (GameList.gameslist.games.game[i].name._comment.length - 2))}`
+                    gamediv.id = `${GameList.gameslist.games.game[i].name._comment.slice(7, (GameList.gameslist.games.game[i].name._comment.length - 2))} - ${GameList.gameslist.games.game[i].appid._text}`
+
+                    runbtn = document.createElement("button")
+                    runbtn.className = "runbtn"
+                    runbtn.innerHTML = `Run Game`
+                    runbtn.id = GameList.gameslist.games.game[i].appid._text
+
+                    runbtn.onclick = function() {
+                        RunAppID(this.id)
+                    }
+    
+                    gamediv.appendChild(runbtn)
+                    GameArray.appendChild(gamediv)
+                }
+            }
+        </script>
+    </body>
+</html>
